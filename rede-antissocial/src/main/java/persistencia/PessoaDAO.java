@@ -16,9 +16,9 @@ import java.util.List;
 public class PessoaDAO {
     
     private String uri = "bolt://localhost:7690";
+    private Driver driver = GraphDatabase.driver(uri, AuthTokens.basic("neo4j", "password"));
 
     public Pessoa inserir(Pessoa p){
-        Driver driver = GraphDatabase.driver(uri, AuthTokens.basic("neo4j", "password"));
         try (Session session = driver.session()) {
             Query query = new Query(
                 "CREATE (p:Pessoa {cpf: $cpf, nome: $nome, email: $email, senha: $senha, dataNascimento: $dataNascimento}) return p",
@@ -32,7 +32,6 @@ public class PessoaDAO {
     }
     
     public boolean atualizar(Pessoa p){
-        Driver driver = GraphDatabase.driver(uri, AuthTokens.basic("neo4j", "password"));
         try (Session session = driver.session()) {
             Query query = new Query(
                 "MATCH (p:Pessoa {cpf: $cpf})SET p.cpf = $cpf, p.nome = $nome, p.email = $email, p.senha = $senha, p.dataNascimento = $dataNascimento return p",
@@ -46,7 +45,6 @@ public class PessoaDAO {
     }
     
     public void deletar(String cpf) {
-        Driver driver = GraphDatabase.driver(uri, AuthTokens.basic("neo4j", "password"));
         try (Session session = driver.session()) {
             Query query = new Query("match(p:Pessoa {cpf: $cpf}) DETACH DELETE p;", parameters("cpf", cpf));
             session.run(query);
@@ -54,7 +52,6 @@ public class PessoaDAO {
     }
 
     public Pessoa obter(String cpf) {
-        Driver driver = GraphDatabase.driver(uri, AuthTokens.basic("neo4j", "password"));
         Pessoa p = null;
         try (Session session = driver.session()) {
             Query query = new Query("MATCH(p:Pessoa {cpf: $cpf}) RETURN p", parameters("cpf", cpf));
@@ -65,7 +62,6 @@ public class PessoaDAO {
     }
 
     public List<Pessoa> obterTodos() {
-        Driver driver = GraphDatabase.driver(uri, AuthTokens.basic("neo4j", "password"));
         List<Pessoa> p = new ArrayList<>();
         try (Session session = driver.session()) {
             Query query = new Query("MATCH(p:Pessoa) RETURN p");
@@ -78,7 +74,6 @@ public class PessoaDAO {
     }
 
     public boolean adicionarAmizade(Pessoa pessoa1, Pessoa pessoa2) {
-        Driver driver = GraphDatabase.driver(uri, AuthTokens.basic("neo4j", "password"));
         try (Session session = driver.session()) {
             Query query = new Query(
                 "MATCH(p1:Pessoa {cpf: $cpf1}), (p2:Pessoa {cpf: $cpf2}) MERGE (p1)-[a1:AMIGO]->(p2) MERGE (p2)-[a2:AMIGO]->(p1) RETURN a1,a2",
@@ -92,7 +87,6 @@ public class PessoaDAO {
     }
 
     public List<Pessoa> obterAmizades(Pessoa p) {
-        Driver driver = GraphDatabase.driver(uri, AuthTokens.basic("neo4j", "password"));
         List<Pessoa> amigos = new ArrayList<>();
         try (Session session = driver.session()) {
             Query query = new Query(
@@ -107,7 +101,6 @@ public class PessoaDAO {
     }
 
     public boolean desfazerAmizade(Pessoa pessoa1, Pessoa pessoa2) {
-        Driver driver = GraphDatabase.driver(uri, AuthTokens.basic("neo4j", "password"));
         try (Session session = driver.session()) {
             Query query = new Query(
                 "MATCH (p1:Pessoa {cpf: $cpf1})-[a1:AMIGO]->(p2:Pessoa {cpf: $cpf2}), (p2)-[a2:AMIGO]->(p1) DELETE a1,a2",
